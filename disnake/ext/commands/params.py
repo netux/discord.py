@@ -164,7 +164,7 @@ class Param:
             default = "..." if annotation.required else repr(annotation.default)
             r = f'Param({default}, description={annotation.description or "description"!r})'
             raise TypeError(f"Param must be a parameter default, not an annotation: \"option: type = {r}\"")
-        
+
         # Get rid of Optionals
         if get_origin(annotation) is Union:
             args = [i for i in annotation.__args__ if i not in (None, type(None))]
@@ -172,7 +172,7 @@ class Param:
                 annotation = args[0]
             else:
                 annotation.__args__ = args
-        
+
         if self.converter is not None:
             # try to parse the converter's annotation, fall back on the annotation itself
             parameters = list(inspect.signature(self.converter).parameters.values())
@@ -195,7 +195,7 @@ class Param:
             pass
         elif isinstance(annotation, EnumMeta):
             self.choices = [OptionChoice(name, value) for name, value in annotation.__members__.items()]  # type: ignore
-            self.type = type(self.choices[0].value)
+            self.type = type(self.choices[0].value.value)
         elif get_origin(annotation) is Literal:
             self.choices = [OptionChoice(str(i), i) for i in annotation.__args__]
             self.type = type(self.choices[0].value)
